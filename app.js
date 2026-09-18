@@ -162,6 +162,7 @@
     aulas: []
   };
 
+  const CHAVE_SESSAO = 'diario_professor_sessao_ativa';
   let sessao = {
     autenticado: false
   };
@@ -258,8 +259,8 @@
       exibirAssinaturasPlano = Boolean(estado.professor.exibirAssinaturasPlano);
     }
 
-    // Se a exigência de senha estiver desativada, já inicia autenticado
-    if (!estado.professor.exigirSenha) {
+    // Se a exigência de senha estiver desativada ou já houver sessão ativa salva, inicia autenticado
+    if (!estado.professor.exigirSenha || localStorage.getItem(CHAVE_SESSAO) === 'true') {
       sessao.autenticado = true;
     }
 
@@ -2133,6 +2134,7 @@
 
   function bloquearTela() {
     sessao.autenticado = false;
+    localStorage.removeItem(CHAVE_SESSAO);
     const authOverlay = document.getElementById('authOverlay');
     if (authOverlay) {
       authOverlay.classList.remove('hidden');
@@ -2176,6 +2178,7 @@
 
     if (email === emailEsperado && senha === senhaEsperada) {
       sessao.autenticado = true;
+      localStorage.setItem(CHAVE_SESSAO, 'true');
       const authOverlay = document.getElementById('authOverlay');
       if (authOverlay) authOverlay.classList.add('hidden');
       mostrarToast(`Bem-vindo, ${prof.nome}!`, 'success');
@@ -2193,12 +2196,28 @@
 
     if (pin === pinEsperado) {
       sessao.autenticado = true;
+      localStorage.setItem(CHAVE_SESSAO, 'true');
       const authOverlay = document.getElementById('authOverlay');
       if (authOverlay) authOverlay.classList.add('hidden');
       mostrarToast(`Desbloqueado com sucesso!`, 'success');
       reRenderizar();
     } else {
       mostrarToast('PIN de acesso incorreto.', 'error');
+    }
+  }
+
+  function recuperarSenha() {
+    if (confirm('Esqueceu sua senha? Deseja redefinir a senha de acesso para "123456" e o PIN para "1234"?')) {
+      salvarPerfilProfessor({
+        senha: '123456',
+        pin: '1234'
+      });
+      sessao.autenticado = true;
+      localStorage.setItem(CHAVE_SESSAO, 'true');
+      const authOverlay = document.getElementById('authOverlay');
+      if (authOverlay) authOverlay.classList.add('hidden');
+      mostrarToast('Senha redefinida para 123456! Você já está conectado.', 'success');
+      reRenderizar();
     }
   }
 
@@ -4724,6 +4743,7 @@
     alternarModoLogin,
     submeterLoginSenha,
     submeterLoginPin,
+    recuperarSenha,
 
     // Perfil do Professor & Fotos
     processarUploadFoto: (e) => {
