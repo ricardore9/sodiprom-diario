@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diário do Professor — Gestão Pedagógica & Educação Profissionalizante</title>
+  
+  <!-- Fontes Tipográficas Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Folha de Estilos Principal -->
+  <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#0284c7" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Barra Superior de Navegação -->
+    <header class="top-navbar no-print">
+      <div class="nav-wrapper">
+        <div class="brand-area" onclick="window.EduPlanApp.navegarPara('dashboard')">
+          <div class="brand-logo">📘⚙️</div>
+          <div>
+            <div class="brand-name">Diário do <span>Professor</span></div>
+            <div class="brand-tagline">Educação Profissional & Tecnológica</div>
+          </div>
+        </div>
+
+        <!-- Menu de Abas -->
+        <nav class="nav-links">
+          <a href="#dashboard" class="nav-item active" data-tab="dashboard">
+            <span>📊</span> Dashboard
+          </a>
+          <a href="#turmas" class="nav-item" data-tab="turmas">
+            <span>🏫</span> Turmas
+          </a>
+          <a href="#planos" class="nav-item" data-tab="planos">
+            <span>📋</span> Planos de Aula
+          </a>
+          <a href="#aulas" class="nav-item" data-tab="aulas">
+            <span>✍️</span> Aulas Dadas
+          </a>
+          <a href="#acompanhamento" class="nav-item" data-tab="acompanhamento">
+            <span>🎯</span> Acompanhamento
+          </a>
+          <a href="#relatorios" class="nav-item" data-tab="relatorios">
+            <span>📄</span> Relatórios
+          </a>
+          <a href="#configuracoes" class="nav-item" data-tab="configuracoes">
+            <span>⚙️</span> Perfil & Ajustes
+          </a>
+        </nav>
+
+        <!-- Botões de Ação do Topo e Chip do Docente -->
+        <div class="nav-actions">
+          <!-- Indicador de Status da Nuvem (Firebase) -->
+          <div 
+            class="cloud-status-chip offline" 
+            id="cloudStatusBadge" 
+            title="Status da Sincronização em Nuvem (Clique para configurar)" 
+            onclick="window.EduPlanApp.navegarPara('configuracoes')"
+          >
+            <span class="cloud-status-dot"></span>
+            <span class="cloud-status-text" id="cloudStatusText">Modo Local</span>
+          </div>
+
+          <!-- Chip com Foto e Nome do Professor -->
+          <div 
+            class="user-nav-chip" 
+            id="userNavChip" 
+            title="Ver e Editar Perfil do Professor" 
+            onclick="window.EduPlanApp.navegarPara('configuracoes')"
+          >
+            <div class="user-nav-avatar" id="userNavAvatar">P</div>
+            <div class="user-nav-info">
+              <span class="user-chip-name" id="userChipName">Prof. Carlos Eduardo</span>
+              <span class="user-chip-materia" id="userChipMateria">Tecnologia & Informática</span>
+            </div>
+          </div>
+
+          <!-- Botão Bloquear / Sair -->
+          <button 
+            class="btn btn-xs btn-outline btn-lock" 
+            id="btnBloquearTela" 
+            title="Bloquear Tela / Sair com Segurança" 
+            onclick="window.EduPlanApp.bloquearTela()"
+          >
+            <span>🔒</span> Bloquear
+          </button>
+
+          <!-- Alternar Tema Claro/Escuro -->
+          <button 
+            class="btn-icon-subtle" 
+            id="btnToggleTema" 
+            title="Alternar Tema Claro/Escuro" 
+            aria-label="Alternar tema"
+            onclick="window.EduPlanApp.alternarTema()"
+          >
+            🌓
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Área Principal de Conteúdo -->
+    <main id="mainContentArea" class="main-content">
+      <!-- O conteúdo das abas é injetado dinamicamente aqui -->
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="app-footer no-print">
+      <p><strong>Diário do Professor</strong> • Sistema para Gestão Pedagógica, Aulas Ministradas e Matrizes da Educação Profissionalizante</p>
+    </footer>
+  </div>
+
+  <!-- Tela de Login & Bloqueio (Auth Gate) -->
+  <div id="authOverlay" class="auth-overlay hidden">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-brand-logo">📘⚙️</div>
+        <h2>Diário do <span>Professor</span></h2>
+        <p>Educação Profissional & Tecnológica</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tabLoginSenha" onclick="window.EduPlanApp.alternarModoLogin('senha')">
+          🔑 E-mail e Senha
+        </button>
+        <button type="button" class="auth-tab-btn" id="tabLoginPin" onclick="window.EduPlanApp.alternarModoLogin('pin')">
+          🔢 PIN Rápido
+        </button>
+      </div>
+
+      <!-- Formulário com Senha -->
+      <form id="formLoginSenha" class="auth-form" onsubmit="window.EduPlanApp.submeterLoginSenha(event)">
+        <div class="auth-field">
+          <label for="loginEmail">E-mail do Docente</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">✉️</span>
+            <input 
+              type="email" 
+              id="loginEmail" 
+              class="auth-input" 
+              placeholder="seu.email@escola.edu.br" 
+              required 
+            />
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="loginSenha">Senha de Acesso</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">🔒</span>
+            <input 
+              type="password" 
+              id="loginSenha" 
+              class="auth-input" 
+              placeholder="Digite sua senha" 
+              required 
+            />
+          </div>
+        </div>
+
+        <button type="submit" class="auth-btn-primary">
+          <span>Entrar no Diário</span> ➔
+        </button>
+      </form>
+
+      <!-- Formulário com PIN Rápido -->
+      <form id="formLoginPin" class="auth-form" style="display: none;" onsubmit="window.EduPlanApp.submeterLoginPin(event)">
+        <div class="auth-field">
+          <label for="loginPin" style="text-align: center;">PIN de Desbloqueio (4 dígitos)</label>
+          <input 
+            type="password" 
+            id="loginPin" 
+            class="auth-input pin-input-large" 
+            maxlength="4" 
+            pattern="[0-9]{4}" 
+            placeholder="••••" 
+            autocomplete="off" 
+          />
+        </div>
+
+        <button type="submit" class="auth-btn-primary">
+          <span>Desbloquear Tela</span> ➔
+        </button>
+      </form>
+
+      <!-- Dica de Credenciais Padrão -->
+      <div class="auth-credentials-hint">
+        💡 <strong>Credenciais Padrão:</strong><br />
+        E-mail: <code>professor@educacao.tec.br</code><br />
+        Senha: <code>123456</code> • PIN: <code>1234</code><br />
+        <small class="text-muted">(Você pode alterar sua senha e foto em Perfil & Ajustes)</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contêiner do Modal Flutuante -->
+  <div id="modalOverlay" class="modal-overlay">
+    <div id="modalContainer"></div>
+  </div>
+
+  <!-- Contêiner de Notificações Toast -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- SDK do Google Firebase (Compat v10 via CDN oficial do Google) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Script Principal da Aplicação (Funciona diretamente via file:/// e HTTP) -->
+  <script src="app.js"></script>
+</body>
+</html>
